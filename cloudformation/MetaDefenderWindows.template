@@ -9,7 +9,7 @@
             "Description": "Select desired instance type"
         },
         "VPC" : {
-            "Type": "String",
+            "Type": "AWS::EC2::VPC::Id",
             "Description": "Specify the desired Virtual Private Cloud."
         },        
         "ActivationKey" : {
@@ -17,7 +17,7 @@
             "Description": "MetaDefender Windows License key - please note that same key might have multiple activations."
         },
         "KeyName": {
-            "Type": "String",
+            "Type": "AWS::EC2::KeyPair::KeyName",
             "Description": "Specify key pair name used to connect to this instance"
         }
     },
@@ -25,7 +25,7 @@
         "MetaDefenderWindowsEC2": {
             "Type": "AWS::EC2::Instance",
             "Properties": {
-                "ImageId": "ami-223ba25a",
+                "ImageId": "ami-d8e239a5",
                 "IamInstanceProfile": {"Ref": "LambdaInstanceProfile"},
                 "InstanceType": {"Ref": "InstanceType"},
                 "KeyName": {"Ref": "KeyName"},
