@@ -167,11 +167,9 @@ Try
             New-Item "$lock" -ItemType file
         }
     }
-    
-    MetaDefenderActivateLicense -apikey $sessionId
+        
     $ActivationDetails = MetaDefenderLicenseDetails -apikey $sessionId | ConvertFrom-Json
-
-    # $S3AccessCredentials = AWSS3Credentials
+    
     $deploymentID = $ActivationDetails.deployment
 
     $environmentVariables = @{
@@ -180,6 +178,8 @@ Try
     }    
 
     AWSUpdateLambdaVariables -FunctionName $LambdaFnName -EnvironmentVariables $environmentVariables -InstanceID $instance
+
+    MetaDefenderActivateLicense -apikey $sessionId
 }
 Catch
 {
