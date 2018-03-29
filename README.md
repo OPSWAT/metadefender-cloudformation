@@ -18,7 +18,7 @@ The predefined flow:
   - Update event rule to trigger lambda function only for the generated EC2 instance
 - Lambda
   - Expects the activation key and deploymentId to be provided as environment variables
-  - Calls deactivate API of MetaDefender Activation Server
+  - Calls MetaDefender Activation Server's Deactivate API 
 
 ##### Notice:
 The AMI used for this script has MetaDefender running on the default port (8008). 
