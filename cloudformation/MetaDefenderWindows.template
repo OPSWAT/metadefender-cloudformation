@@ -8,10 +8,18 @@
             "AllowedValues": ["m4.xlarge", "m4.2xlarge", "m4.4xlarge", "c4.2xlarge", "c4.4xlarge", "c4.8xlarge"],
             "Description": "Select desired instance type"
         },
+        "AMI" : {
+            "Type": "AWS::EC2::Image::Id",
+            "Description": "Specify the MetaDefender AMI."
+        },     
         "VPC" : {
             "Type": "AWS::EC2::VPC::Id",
             "Description": "Specify the desired Virtual Private Cloud."
-        },        
+        },      
+        "Subnet": {
+            "Description": "Specify the subnet",
+            "Type": "AWS::EC2::Subnet::Id"
+        },  
         "ActivationKey" : {
             "Type": "String",
             "Description": "MetaDefender Windows License key - please note that same key might have multiple activations."
@@ -25,11 +33,17 @@
         "MetaDefenderWindowsEC2": {
             "Type": "AWS::EC2::Instance",
             "Properties": {
-                "ImageId": "ami-d8e239a5",
+                "ImageId": {"Ref": "AMI"},
                 "IamInstanceProfile": {"Ref": "LambdaInstanceProfile"},
                 "InstanceType": {"Ref": "InstanceType"},
                 "KeyName": {"Ref": "KeyName"},
-                "SecurityGroupIds": [ {"Ref": "MetaDefenderSecurityGroup"} ],
+                "NetworkInterfaces": [ {
+                    "AssociatePublicIpAddress": "true",
+                    "DeviceIndex": "0",
+                    "GroupSet": [{ "Ref" : "MetaDefenderSecurityGroup" }],
+                    "SubnetId": { "Ref" : "Subnet" }
+                    } 
+                ],
                 "UserData": { "Fn::Base64": { "Fn::Join": 
                     [
                         "\n", 
@@ -377,14 +391,6 @@
         "InstanceId": {
             "Description": "MetaDefender Instance Identifier",
             "Value": { "Ref": "MetaDefenderWindowsEC2" }
-        },
-        "PublicIP": {
-            "Description": "MetaDefender Public IP",
-            "Value": { "Fn::GetAtt": [ "MetaDefenderWindowsEC2", "PublicIp" ] }
-        },
-        "PublicDNS": {
-            "Description": "MetaDefender Public DNS",
-            "Value": { "Fn::GetAtt": [ "MetaDefenderWindowsEC2", "PublicDnsName" ] }
-        }
+        }        
     }    
 }
