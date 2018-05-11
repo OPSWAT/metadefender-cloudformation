@@ -1,8 +1,9 @@
 <powershell>
 $lock = "C:\Program Files\OPSWAT\pwd_ch_lock"
+
 # {"Fn::Join": ["", ["$ActivationKey = ", "\"", {"Ref": "ActivationKey"}, "\""]]},
 # {"Fn::Join": ["", ["$LambdaFnName = ", "\"", {"Ref": "DeactivateLambda"}, "\""]]},
-
+$restUrl = "http://localhost:8008"
 
 function MetaDefenderLogin() {
     Param
@@ -17,7 +18,8 @@ function MetaDefenderLogin() {
         "password"="$password";
     } | ConvertTo-Json
 
-    $response = Invoke-WebRequest -UseBasicParsing -Uri http://localhost:8008/login -Method POST -Body $body -ContentType "application/json" | ConvertFrom-Json    
+    $loginUrl = $restUrl + "/login"
+    $response = Invoke-WebRequest -UseBasicParsing -Uri $loginUrl -Method POST -Body $body -ContentType "application/json" | ConvertFrom-Json    
     return $response.session_id    
 }
 
@@ -39,8 +41,10 @@ function MetaDefenderChangePassword() {
         "new_password"="$instance";
     } | ConvertTo-Json
     
+    $changePassUrl = $restUrl + "/user/changepassword"
+
     #Change password
-    return Invoke-WebRequest -UseBasicParsing -Uri http://localhost:8008/user/changepassword -Method POST -Headers $headers -Body $body -ContentType "application/json" | 
+    return Invoke-WebRequest -UseBasicParsing -Uri $changePassUrl -Method POST -Headers $headers -Body $body -ContentType "application/json" | 
             ConvertFrom-Json    
 }
 
@@ -62,7 +66,9 @@ function MetaDefenderActivateLicense () {
         "quantity" = "1"; 
         "comment" = "$Comment";
     } | ConvertTo-Json
-    return Invoke-WebRequest -UseBasicParsing http://localhost:8008/admin/license/activation -Headers $headers -ContentType "application/json" -Method POST -Body $body 
+
+    $activationUrl = $restUrl + "/admin/license/activation"
+    return Invoke-WebRequest -UseBasicParsing $activationUrl -Headers $headers -ContentType "application/json" -Method POST -Body $body 
 }
 
 function MetaDefenderLicenseDetails () {
@@ -77,7 +83,8 @@ function MetaDefenderLicenseDetails () {
         "apikey"="$apikey";
     }
     
-    $ActivationDetails = Invoke-WebRequest -UseBasicParsing http://localhost:8008/admin/license -Headers $headers -ContentType "application/json" -Method GET    
+    $licenseUrl = $restUrl + "/admin/license"
+    $ActivationDetails = Invoke-WebRequest -UseBasicParsing $licenseUrl -Headers $headers -ContentType "application/json" -Method GET    
     return $ActivationDetails
 }
 
@@ -97,14 +104,35 @@ function AWSUpdateLambdaVariables() {
         [String] $InstanceID          
     )
 
-    Update-LMFunctionConfiguration -FunctionName $FunctionName -Environment_Variable $EnvironmentVariables
+    $configuration = Get-LMFunctionConfiguration -FunctionName $FunctionName
+    $existingVars = $configuration.Environment.Variables
+
+    $keys = $existingVars.getenumerator() | foreach-object {$_.key}   
+    $keys | foreach-object {
+        $key = $_
+        if ($EnvironmentVariables.containskey($key))
+        {
+            $existingVars.remove($key)            
+        }
+    }
+
+    $allVars = $existingVars + $EnvironmentVariables 
+    
+    Update-LMFunctionConfiguration -FunctionName $FunctionName -Environment_Variable $allVars
 
     #update event rule to limit lambda function to this instance
     $eventRule = Get-CWERule -NamePrefix $CWEventRule
-    $pattern = $eventRule.EventPattern
-    $instanceFilter = 
+    $pattern = $eventRule.EventPattern | ConvertFrom-Json  
+    $ruleDetails = $pattern.detail
     
-    $new_pattern = $pattern.replace('{"state"', '{"instance-id": ["' + $InstanceID + '"],"state"')
+    $instanceIds = @($InstanceID)
+    if ($ruleDetails | Get-Member -Name 'instance-id') {
+        $existingIds = $ruleDetails | Get-Member -Name 'instance-id'        
+        $instanceIds = $existingIds + $InstanceID
+    }
+    
+    $ruleDetails | Add-Member -Force -Name 'instance-id' -Type NoteProperty -Value $instanceIds        
+    $new_pattern = $pattern | ConvertTo-Json
 
     # update the rule
     Write-CWERule -Name $CWEventRule -EventPattern $new_pattern
@@ -171,10 +199,10 @@ Try
     $ActivationDetails = MetaDefenderLicenseDetails -apikey $sessionId | ConvertFrom-Json
     
     $deploymentID = $ActivationDetails.deployment
+    $envVarInstanceId = "$instance".replace('-', '_')
 
     $environmentVariables = @{
-        "DeploymentID" = "$deploymentID";
-        "ActivationKey" = "$ActivationKey";
+        "$envVarInstanceId" = "$deploymentID";        
     }    
 
     AWSUpdateLambdaVariables -FunctionName $LambdaFnName -EnvironmentVariables $environmentVariables -InstanceID $instance
