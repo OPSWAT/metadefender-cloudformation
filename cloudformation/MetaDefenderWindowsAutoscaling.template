@@ -180,8 +180,8 @@
     "Parameters": {
         "InstanceType": {
             "Type": "String",
-            "Default": "m5d.xlarge",
-            "AllowedValues": ["m5d.xlarge", "m5d.2xlarge", "c5d.xlarge", "c5d.2xlarge"],
+            "Default": "c5.2xlarge",
+            "AllowedValues": ["m5d.xlarge", "m5d.2xlarge", "c5d.xlarge", "c5d.2xlarge", "c5.xlarge", "c5.2xlarge", "c5.4xlarge"],
             "Description": "Select desired instance type"
         },
         "CoreAMI" : {
@@ -4129,7 +4129,7 @@
                 "Statistic": "Average",
                 "Period": "60",
                 "EvaluationPeriods": "3",
-                "Threshold": "30",
+                "Threshold": "20",
                 "AlarmActions": [ { "Ref": "WebServerScaleUpPolicy" } ],
                 "Dimensions": [
                     {
