@@ -8,18 +8,56 @@ IAM roles are build in order to:
 - allow EC2 instance to update lambda function
 - invoke DeactivateLambda function execution
 
+### CloudFormation Scripts
+
+#### [Stand-alone MetaDefender Core](cloudformation/MetaDefenderWindows.template)
+Launch a MetaDefender Core instance using a predefined AMI.
+Applies the license keys and generates the additional resource (DeactivateLambda, DeactivateEventRule, IAM Profile, SG, etc.)
+
+#### [Distributed Environment](cloudformation/MetaDefenderWindowsCM2AZ.template)
+VPC:
+- Creates a public subnet and 2 private subnets in 2 different AZs.
+
+EC2:
+- Launches 2 instances of MetaDefender Core
+  - Each instance is deployed in a separated AZ, in one of the new created private subnets
+- Launchesz OPSWAT Central Management in the public subnet
+  - Activates Central Management and registers the 2 instances of MetaDefender Core
+  - Retrieves all the engines and workflows
+
+#### [Autoscaling](cloudformation/MetaDefenderWindowsAutoscaling.template)
+VPC:
+- Creates public and private subnets
+  - Based on [quickstart-aws-vpc](https://github.com/aws-quickstart/quickstart-aws-vpc "Quicstart AWS VPC")
+
+EC2:
+- Launches OPSWAT Central Management in the public subnet
+  - Activates Central Management
+  - Retrieves all the engines and workflows
+
+Autoscaling Group:
+- Launches 1 instance of MetaDefender Core
+  - Activates the product
+  - Attaches it to OPSWAT Central Management
+  - Adds it to ELB
+- CPU High/Low alerts defined to scale up or down the deployment
+
+ELB:
+- Load balances all active MetaDefender Core instances
+  - Sticky session is enabled
+
 
 ### Execution Flow
 The predefined flow:
 - EC2 instance has EC2UserData enabled and the boot script will:
   - Change password from default to instanceId at first run
   - Activate the product at each run
-  - Update Lambda function with the new deploymentId
+  - Update Lambda environment variables with the new deploymentId
   - Update event rule to trigger lambda function only for the generated EC2 instance
 - Lambda
   - Expects the activation key and deploymentId to be provided as environment variables
-  - Calls MetaDefender Activation Server's Deactivate API 
+  - Calls MetaDefender Activation Server's Deactivate API
 
 ##### Notice:
-The AMI used for this script has MetaDefender running on the default port (8008). 
-
+1. The AMI used for this script has MetaDefender running on the default port (8008).
+2. All the used EC2UserData scripts are defined added inline in the CloudFormation template for visibility. The scripts are also available as shell/Powershell separately.
