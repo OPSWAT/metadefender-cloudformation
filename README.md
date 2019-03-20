@@ -1,7 +1,7 @@
 # metadefender-cloudformation
 
 ### MetaDefender CloudFormation 
-Draft script to generate all resources needed to run the MetaDefender AMI. 
+CloudFormation Templates to generate all resources needed to run the MetaDefender AMI. 
 
 ##### Notice:
 IAM roles are build in order to:
