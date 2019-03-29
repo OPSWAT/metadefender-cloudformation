@@ -72,6 +72,6 @@ In the *AWS CloudFormation User Guide*, you can view more information about the 
 
 For specific product questions or issues please contact [support](https://www.opswat.com/support).
 
-## Licence
+## License
 
 [MIT](https://github.com/OPSWAT/metadefender-cloudformation/blob/master/LICENSE)
