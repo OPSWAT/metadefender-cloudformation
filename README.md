@@ -61,3 +61,13 @@ The predefined flow:
 ##### Notice:
 1. The AMI used for this script has MetaDefender running on the default port (8008).
 2. All the used EC2UserData scripts are defined added inline in the CloudFormation template for visibility. The scripts are also available as shell/Powershell separately.
+
+## Additional Resources
+In the *AWS CloudFormation User Guide*, you can view more information about the following topics:
+
+- Learn how to use templates to create AWS CloudFormation stacks using the [AWS Management Console](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-console-create-stack.html) or [AWS Command Line Interface (AWS CLI)](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-cli-creating-stack.html).
+- To view all the supported AWS resources and their properties, see the [Template Reference](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-reference.html).
+
+## Licence
+
+[MIT](https://github.com/OPSWAT/metadefender-cloudformation/blob/master/LICENSE)
