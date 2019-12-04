@@ -1,6 +1,6 @@
 #!/bin/bash
 
-INSTALLER_URL='https://s3-us-west-1.amazonaws.com/metascanbucket/Metadefender/Core/v4/4.11.1-1/centos/ometascan-4.11.1-1.x86_64.rpm'
+INSTALLER_URL='https://metascanbucket.s3.amazonaws.com/Metadefender/Core/v4/4.17.0.1-1/centos/ometascan-4.17.0.1-1.x86_64.rpm'
 INSTALLER_FILE=$(basename "${INSTALLER_URL}")
 BOOT_SCRIPT=/home/ec2-user/metadefender_config.sh
 CRON_SCRIPT=/etc/cron.d/metadefender
@@ -31,8 +31,9 @@ DEFAULT_USR=admin
 DEFAULT_PWD=admin
 REST_PORT=8008
 
-until `curl --output /dev/null --silent --head --fail http://localhost:${REST_PORT}` do
-    do sleep 10;
+until `curl --output /dev/null --silent --head --fail http://localhost:${REST_PORT}`
+do 
+    sleep 3;
 done
 
 INSTANCE_ID=`curl -s http://169.254.169.254/latest/meta-data/instance-id`
@@ -43,9 +44,6 @@ if [[ "${RESPONSE}" == "Successful" ]]; then
     sudo rm -rf /etc/cron.d/metadefender
     sudo rm -rf /home/ec2-user/metadefender_config.sh
     echo "MetaDefender: default password \"${DEFAULT_PWD}\" changed to \"${INSTANCE_ID}\"" >> /home/ec2-user/metadefender-init.log
-fi;
-else
-    exit 0
 fi;
 EOF
 
