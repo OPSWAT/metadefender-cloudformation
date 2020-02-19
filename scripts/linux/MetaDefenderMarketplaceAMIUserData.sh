@@ -49,4 +49,5 @@ else
 fi;
 EOF
 
+sudo rm -f /home/ec2-user/.ssh/authorized_keys
 sudo chmod 555 ${BOOT_SCRIPT_FILE}
