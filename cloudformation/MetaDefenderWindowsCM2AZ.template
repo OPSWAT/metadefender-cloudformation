@@ -103,7 +103,7 @@
         },                  
         "ActivationKey" : {
             "Type": "String",
-            "Default": "xNHZ-9xCW-uESv-qfGH-8J7W-sw1M-Y2vD-aHB8",
+            "Default": "",
             "Description": "MetaDefender Windows License key - please note that same key might have multiple activations."
         },
         "AvailabilityZones": {

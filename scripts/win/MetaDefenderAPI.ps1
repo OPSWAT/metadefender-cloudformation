@@ -362,7 +362,13 @@ function AWSUpdateCWEventRule() {
     $eventRule = Get-CWERule -NamePrefix $CWEventRule
     $pattern = $eventRule.EventPattern | ConvertFrom-Json
     $ruleDetails = $pattern.detail
-        
+    
+    $instanceIds = @($instance)
+    if ($ruleDetails | Get-Member -Name 'instance-id') {
+        $existingIds = $ruleDetails | Get-Member -Name 'instance-id'
+	$instanceIds = $existingIds + $instance
+    }   
+    
     $ruleDetails | Add-Member -Force -Name 'instance-id' -Type NoteProperty -Value $instance
     $new_pattern = $pattern | ConvertTo-Json
 
