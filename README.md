@@ -6,12 +6,12 @@ CloudFormation Templates to generate all resources needed to run the MetaDefende
 ##### Notice:
 IAM roles are build in order to:
 - allow EC2 instance to update lambda function
-- invoke DeactivateLambda function execution
+- invoke the DeactivateLambda function execution
 
 ### CloudFormation Scripts
 
 #### [Stand-alone MetaDefender Core](cloudformation/MetaDefenderWindows.template)
-Launch a MetaDefender Core instance using a predefined AMI.
+Launches a MetaDefender Core instance using a predefined AMI.
 Applies the license keys and generates the additional resource (DeactivateLambda, DeactivateEventRule, IAM Profile, SG, etc.)
 
 #### [Distributed Environment](cloudformation/MetaDefenderWindowsCM2AZ.template)
@@ -21,7 +21,7 @@ VPC:
 EC2:
 - Launches 2 instances of MetaDefender Core
   - Each instance is deployed in a separated AZ, in one of the new created private subnets
-- Launchesz OPSWAT Central Management in the public subnet
+- Launches OPSWAT Central Management in the public subnet
   - Activates Central Management and registers the 2 instances of MetaDefender Core
   - Retrieves all the engines and workflows
 
@@ -60,7 +60,7 @@ The predefined flow:
 
 ##### Notice:
 1. The AMI used for this script has MetaDefender running on the default port (8008).
-2. All the used EC2UserData scripts are defined added inline in the CloudFormation template for visibility. The scripts are also available as shell/Powershell separately.
+2. All the used EC2UserData scripts are defined inline in the CloudFormation template for visibility. The scripts are also available as shell/Powershell separately.
 
 ## Additional Resources
 In the *AWS CloudFormation User Guide*, you can view more information about the following topics:
@@ -70,7 +70,7 @@ In the *AWS CloudFormation User Guide*, you can view more information about the 
 
 ## Support
 
-For specific product questions or issues please contact [support](https://www.opswat.com/support).
+For specific product-related questions or issues please contact [support](https://www.opswat.com/support).
 
 ## License
 
